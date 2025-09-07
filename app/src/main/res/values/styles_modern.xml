@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Style pour les cartes -->
+    <style name="CardStyle">
+        <item name="android:background">@drawable/card_background</item>
+        <item name="android:layout_margin">8dp</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:elevation">4dp</item>
+    </style>
+    
+    <!-- Style pour les boutons principaux -->
+    <style name="PrimaryButtonStyle">
+        <item name="android:background">@drawable/button_primary</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="android:layout_margin">4dp</item>
+        <item name="android:elevation">2dp</item>
+    </style>
+    
+    <!-- Style pour les boutons secondaires -->
+    <style name="SecondaryButtonStyle">
+        <item name="android:background">@drawable/button_secondary</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:minHeight">40dp</item>
+        <item name="android:layout_margin">4dp</item>
+        <item name="android:elevation">1dp</item>
+    </style>
+    
+    <!-- Style pour les champs de texte -->
+    <style name="EditTextStyle">
+        <item name="android:background">@drawable/edittext_background</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textColorHint">@color/text_hint</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:padding">12dp</item>
+        <item name="android:layout_margin">4dp</item>
+        <item name="android:minHeight">48dp</item>
+    </style>
+    
+    <!-- Style pour les titres -->
+    <style name="TitleStyle">
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:gravity">center</item>
+        <item name="android:layout_margin">16dp</item>
+    </style>
+    
+    <!-- Style pour les sous-titres -->
+    <style name="SubtitleStyle">
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_margin">8dp</item>
+    </style>
+    
+    <!-- Style pour le texte d'information -->
+    <style name="InfoTextStyle">
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:layout_margin">8dp</item>
+    </style>
+    
+    <!-- Style pour le statut -->
+    <style name="StatusTextStyle">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:gravity">center</item>
+        <item name="android:layout_margin">8dp</item>
+        <item name="android:padding">8dp</item>
+        <item name="android:background">@drawable/status_background</item>
+    </style>
+</resources>

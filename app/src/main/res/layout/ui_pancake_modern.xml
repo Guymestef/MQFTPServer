@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_dark"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- En-tête avec icône et titre -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="24dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="📡"
+                android:textSize="32sp"
+                android:layout_marginEnd="12dp" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/TitleStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Serveur FTP Meta Quest"
+                    android:gravity="start"
+                    android:layout_margin="0dp" />
+
+                <TextView
+                    style="@style/InfoTextStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Partagez vos fichiers facilement"
+                    android:gravity="start"
+                    android:layout_margin="0dp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Statut et IP dans une carte -->
+        <LinearLayout
+            style="@style/CardStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/SubtitleStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="🌐 État de la connexion"
+                android:layout_margin="0dp"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/ip_address"
+                style="@style/InfoTextStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="📍 IP locale: Recherche..."
+                android:textColor="@color/status_info"
+                android:textSize="16sp"
+                android:layout_margin="0dp"
+                android:padding="8dp"
+                android:background="@drawable/status_background" />
+
+            <TextView
+                android:id="@+id/server_status"
+                style="@style/StatusTextStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="⏹️ Serveur arrêté"
+                android:textColor="@color/status_error"
+                android:layout_marginTop="8dp" />
+        </LinearLayout>
+
+        <!-- Configuration du serveur dans une carte -->
+        <LinearLayout
+            style="@style/CardStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/SubtitleStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="⚙️ Configuration"
+                android:layout_margin="0dp"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Port -->
+            <TextView
+                style="@style/InfoTextStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Port de connexion"
+                android:gravity="start"
+                android:textStyle="bold"
+                android:layout_margin="0dp" />
+
+            <EditText
+                android:id="@+id/ftp_port"
+                style="@style/EditTextStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="2121"
+                android:inputType="number"
+                android:text="2121"
+                android:drawableStart="@android:drawable/ic_menu_sort_by_size"
+                android:drawablePadding="8dp"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Utilisateur -->
+            <TextView
+                style="@style/InfoTextStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Nom d'utilisateur"
+                android:gravity="start"
+                android:textStyle="bold"
+                android:layout_margin="0dp" />
+
+            <EditText
+                android:id="@+id/ftp_user"
+                style="@style/EditTextStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="admin"
+                android:text="admin"
+                android:drawableStart="@android:drawable/ic_menu_my_calendar"
+                android:drawablePadding="8dp"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Mot de passe -->
+            <TextView
+                style="@style/InfoTextStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Mot de passe"
+                android:gravity="start"
+                android:textStyle="bold"
+                android:layout_margin="0dp" />
+
+            <EditText
+                android:id="@+id/ftp_password"
+                style="@style/EditTextStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="password"
+                android:text="password"
+                android:inputType="textPassword"
+                android:drawableStart="@android:drawable/ic_lock_lock"
+                android:drawablePadding="8dp"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Dossier racine -->
+            <TextView
+                style="@style/InfoTextStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Dossier à partager"
+                android:gravity="start"
+                android:textStyle="bold"
+                android:layout_margin="0dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+
+                <EditText
+                    android:id="@+id/ftp_root"
+                    style="@style/EditTextStyle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="/storage/emulated/0/Movies/ftp"
+                    android:drawableStart="@android:drawable/ic_menu_upload"
+                    android:drawablePadding="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_margin="0dp" />
+
+                <Button
+                    android:id="@+id/btn_browse_folder"
+                    style="@style/SecondaryButtonStyle"
+                    android:layout_width="56dp"
+                    android:layout_height="48dp"
+                    android:text="📁"
+                    android:textSize="18sp"
+                    android:layout_margin="0dp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Contrôles principaux -->
+        <LinearLayout
+            style="@style/CardStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/SubtitleStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="🎮 Contrôles"
+                android:layout_margin="0dp"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Boutons de contrôle -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="12dp">
+
+                <Button
+                    android:id="@+id/btn_start_ftp"
+                    style="@style/PrimaryButtonStyle"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_weight="1"
+                    android:text="▶️ Démarrer"
+                    android:textSize="16sp"
+                    android:layout_marginEnd="8dp" />
+
+                <Button
+                    android:id="@+id/btn_stop_ftp"
+                    style="@style/SecondaryButtonStyle"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_weight="1"
+                    android:text="⏹️ Arrêter"
+                    android:textSize="16sp"
+                    android:layout_marginStart="8dp" />
+            </LinearLayout>
+
+            <!-- Boutons d'exploration -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btn_list_files"
+                    style="@style/SecondaryButtonStyle"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:text="📂 Explorer"
+                    android:layout_marginEnd="4dp" />
+
+                <Button
+                    android:id="@+id/btn_refresh_files"
+                    style="@style/SecondaryButtonStyle"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:text="🔄 Actualiser"
+                    android:layout_marginStart="4dp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Guide d'utilisation -->
+        <LinearLayout
+            style="@style/CardStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/background_surface">
+
+            <TextView
+                style="@style/SubtitleStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="ℹ️ Comment se connecter"
+                android:layout_margin="0dp"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                style="@style/InfoTextStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="1. Assurez-vous d'être sur le même réseau WiFi\n2. Ouvrez un client FTP sur votre appareil\n3. Connectez-vous avec l'IP et les identifiants affichés\n4. Naviguez et transférez vos fichiers"
+                android:gravity="start"
+                android:lineSpacingExtra="4dp"
+                android:layout_margin="0dp" />
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>
