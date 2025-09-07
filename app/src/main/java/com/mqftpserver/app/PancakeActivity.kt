@@ -1,4 +1,4 @@
-package com.meta.spatial.samples.hybridsample
+package com.mqftpserver.app
 
 import android.app.Activity
 import android.app.AlertDialog

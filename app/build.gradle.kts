@@ -12,11 +12,11 @@ plugins {
 }
 
 android {
-  namespace = "com.meta.spatial.samples.hybridsample"
+  namespace = "com.mqftpserver.app"
   compileSdk = 34
 
   defaultConfig {
-    applicationId = "com.meta.spatial.samples.hybridsample"
+    applicationId = "com.mqftpserver.app"
     minSdk = 29
     //noinspection ExpiredTargetSdkVersion
     targetSdk = 34

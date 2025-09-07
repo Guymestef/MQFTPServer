@@ -18,9 +18,10 @@ dependencyResolutionManagement {
   repositories {
     mavenCentral()
     google()
+    jcenter() // Warning: this repository is going to shut down soon
   }
 }
 
-rootProject.name = "HybridSample"
+rootProject.name = "MQFTPServer"
 
 include(":app")
