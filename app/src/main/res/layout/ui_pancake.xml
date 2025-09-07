@@ -1,0 +1,177 @@
+<?xml version="1.0" ?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  android:orientation="vertical"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:gravity="left"
+  android:background="#0F0F0F"
+  android:clipToOutline="true"
+>
+  <!--Heading-->
+  <TextView
+    android:gravity="center"
+    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:text="Configuration du serveur FTP"
+    android:textSize="24dp"
+    android:textStyle="bold"
+    android:textColor="#ffffff"
+    android:layout_marginTop="16dp" />
+
+  <ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"
+    android:padding="16dp">
+
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="vertical">
+
+      <EditText
+        android:id="@+id/ftp_port"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Port (ex: 2121)"
+        android:inputType="number"
+        android:text="2121"
+        android:textColor="#ffffff"
+        android:textColorHint="#cccccc"
+        android:backgroundTint="#cccccc"
+        android:layout_margin="8dp" />
+
+      <EditText
+        android:id="@+id/ftp_user"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Utilisateur"
+        android:text="admin"
+        android:textColor="#ffffff"
+        android:textColorHint="#cccccc"
+        android:backgroundTint="#cccccc"
+        android:layout_margin="8dp" />
+
+      <EditText
+        android:id="@+id/ftp_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Mot de passe"
+        android:text="password"
+        android:inputType="textPassword"
+        android:textColor="#ffffff"
+        android:textColorHint="#cccccc"
+        android:backgroundTint="#cccccc"
+        android:layout_margin="8dp" />
+
+      <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="8dp">
+
+        <EditText
+          android:id="@+id/ftp_root"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:layout_weight="1"
+          android:hint="Dossier racine (ex: /sdcard/ftp)"
+          android:textColor="#ffffff"
+          android:textColorHint="#cccccc"
+          android:backgroundTint="#cccccc"
+          android:layout_marginEnd="8dp" />
+
+        <Button
+          android:id="@+id/btn_browse_folder"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="📁"
+          android:textSize="16dp"
+          android:background="@drawable/button_bg"
+          android:textColor="#ffffff"
+          android:minWidth="48dp" />
+
+      </LinearLayout>
+
+      <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="8dp">
+        
+        <Button
+          android:id="@+id/btn_list_files"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:layout_weight="1"
+          android:text="📂 Explorer"
+          android:background="@drawable/button_bg"
+          android:textColor="#ffffff"
+          android:layout_marginEnd="8dp" />
+
+        <Button
+          android:id="@+id/btn_refresh_files"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:layout_weight="1"
+          android:text="🔄 Actualiser"
+          android:background="@drawable/button_bg"
+          android:textColor="#ffffff" />
+          
+      </LinearLayout>
+
+      <TextView
+        android:id="@+id/ip_address"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="IP locale: Recherche..."
+        android:textColor="#66CCFF"
+        android:textSize="14dp"
+        android:gravity="center"
+        android:layout_margin="8dp" />
+
+      <TextView
+        android:id="@+id/server_status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Serveur arrêté"
+        android:textColor="#ff6666"
+        android:textSize="16dp"
+        android:gravity="center"
+        android:layout_margin="8dp" />
+
+    </LinearLayout>
+  </ScrollView>
+
+  <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center"
+    android:layout_margin="16dp">
+    
+    <Button
+      android:id="@+id/btn_start_ftp"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_weight="1"
+      android:text="Démarrer FTP"
+      android:background="@drawable/button_bg"
+      android:textColor="#ffffff"
+      android:layout_marginEnd="8dp" />
+      
+    <Button
+      android:id="@+id/btn_stop_ftp"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_weight="1"
+      android:text="Arrêter FTP"
+      android:background="@drawable/button_bg"
+      android:textColor="#ffffff"
+      android:layout_marginStart="8dp" />
+      
+  </LinearLayout>
+</LinearLayout>
