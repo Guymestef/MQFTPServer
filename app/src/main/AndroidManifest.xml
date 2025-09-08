@@ -25,6 +25,8 @@
   <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
   <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+  <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" 
+    android:minSdkVersion="30" />
   <uses-permission android:name="android.permission.WAKE_LOCK" />
   <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
   <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
@@ -65,12 +67,12 @@
       android:required="false"
     />
     <activity
-      android:name=".PancakeActivity"
+      android:name="com.mqftpserver.app.PancakeActivity"
       android:exported="true"
       android:resizeableActivity="true"
     >
-      <!-- Set the panel size when not in immersive (VR) mode -->
-      <layout android:defaultHeight="550dp" android:defaultWidth="800dp" />
+      <!-- Set the panel size optimized for Meta Quest 3 VR mode -->
+      <layout android:defaultHeight="700dp" android:defaultWidth="1200dp" />
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
         <category android:name="android.intent.category.DEFAULT" />

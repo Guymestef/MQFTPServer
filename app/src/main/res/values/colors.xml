@@ -26,6 +26,24 @@
     <color name="status_error">#F44336</color>
     <color name="status_info">#2196F3</color>
     
+    <!-- Couleurs des boutons -->
+    <color name="button_text_primary">#FFFFFF</color>
+    <color name="button_text_secondary">#1E88E5</color>
+    <color name="button_text_danger">#FFFFFF</color>
+    
+    <!-- Couleurs d'état des boutons -->
+    <color name="button_primary">#1E88E5</color>
+    <color name="button_primary_pressed">#1565C0</color>
+    <color name="button_secondary">#2D2D2D</color>
+    <color name="button_secondary_pressed">#3D3D3D</color>
+    <color name="button_danger">#F44336</color>
+    <color name="button_danger_pressed">#D32F2F</color>
+    
+    <!-- Couleurs des champs de saisie -->
+    <color name="edittext_background">#2D2D2D</color>
+    <color name="edittext_border">#424242</color>
+    <color name="edittext_border_focused">#1E88E5</color>
+    
     <!-- Transparence -->
     <color name="overlay_dark">#80000000</color>
     <color name="divider">#424242</color>

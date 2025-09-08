@@ -131,15 +131,22 @@ class SimpleFtpServer(
                     "LIST" -> {
                         if (isAuthenticated) {
                             try {
-                                output.println("150 Opening ASCII mode data connection for file list")
+                                Log.d(TAG, "LIST command received for directory: ${currentDirectory.absolutePath}")
                                 
                                 if (passiveMode && dataServerSocket != null) {
                                     // Mode passif - utiliser la connexion de données
+                                    Log.d(TAG, "Using passive mode for LIST")
+                                    output.println("150 Opening ASCII mode data connection for file list")
+                                    
                                     val dataConnection = dataServerSocket!!.accept()
                                     val dataOutput = PrintWriter(OutputStreamWriter(dataConnection.getOutputStream(), StandardCharsets.UTF_8), true)
                                     
                                     val listing = buildFileList(currentDirectory)
-                                    dataOutput.print(listing)
+                                    Log.d(TAG, "Passive mode - sending listing (${listing.length} chars)")
+                                    
+                                    if (listing.isNotEmpty()) {
+                                        dataOutput.print(listing)
+                                    }
                                     dataOutput.flush()
                                     
                                     dataOutput.close()
@@ -147,24 +154,25 @@ class SimpleFtpServer(
                                     dataServerSocket?.close()
                                     dataServerSocket = null
                                     passiveMode = false
-                                } else {
-                                    // Mode actif simplifié - envoyer directement
-                                    val listing = buildFileList(currentDirectory)
-                                    Log.d(TAG, "Sending file list: $listing")
                                     
-                                    // Envoyer ligne par ligne
-                                    listing.split("\n").forEach { line ->
-                                        if (line.isNotEmpty()) {
-                                            output.println(line)
-                                        }
-                                    }
+                                    output.println("226 Transfer complete")
+                                    Log.d(TAG, "LIST command completed successfully")
+                                } else {
+                                    // Pas de mode passif configuré
+                                    Log.w(TAG, "LIST command without passive mode - requesting PASV first")
+                                    output.println("425 Use PASV first")
                                 }
-                                
-                                output.println("226 Transfer complete")
-                                Log.d(TAG, "LIST command completed")
                             } catch (e: Exception) {
                                 Log.e(TAG, "Error in LIST command", e)
                                 output.println("550 Error listing directory")
+                                // Nettoyer en cas d'erreur
+                                try {
+                                    dataServerSocket?.close()
+                                } catch (ex: Exception) {
+                                    Log.e(TAG, "Error closing data socket", ex)
+                                }
+                                dataServerSocket = null
+                                passiveMode = false
                             }
                         } else {
                             output.println("530 Not logged in")
@@ -516,27 +524,61 @@ class SimpleFtpServer(
         return buildString {
             try {
                 Log.d(TAG, "Building file list for: ${directory.absolutePath}")
-                val files = directory.listFiles()
+                Log.d(TAG, "Directory exists: ${directory.exists()}")
+                Log.d(TAG, "Directory is readable: ${directory.canRead()}")
                 
-                if (files == null || files.isEmpty()) {
-                    Log.d(TAG, "Directory is empty or null")
+                val files = directory.listFiles()
+                Log.d(TAG, "Files array: ${files?.size ?: "null"}")
+                
+                if (files == null) {
+                    Log.w(TAG, "Cannot list files - permission denied or directory doesn't exist")
                     return@buildString
                 }
                 
+                if (files.isEmpty()) {
+                    Log.d(TAG, "Directory is empty")
+                    return@buildString
+                }
+                
+                Log.d(TAG, "Found ${files.size} items in directory")
+                
+                // Trier et afficher tous les fichiers, même ceux non lisibles
                 files.sortedWith(compareBy({ !it.isDirectory }, { it.name })).forEach { file ->
                     try {
-                        val permissions = if (file.isDirectory) "drwxr-xr-x" else "-rw-r--r--"
-                        val size = if (file.isDirectory) "4096" else file.length().toString().padStart(8)
+                        val canRead = file.canRead()
+                        val canWrite = file.canWrite()
+                        val isDir = file.isDirectory
+                        
+                        Log.d(TAG, "Item: ${file.name} - isDir: $isDir - canRead: $canRead")
+                        
+                        // Afficher le fichier même s'il n'est pas lisible, avec des permissions appropriées
+                        val permissions = when {
+                            isDir && canRead -> "drwxr-xr-x"
+                            isDir && !canRead -> "d---------"
+                            !isDir && canRead && canWrite -> "-rw-r--r--"
+                            !isDir && canRead && !canWrite -> "-r--r--r--"
+                            !isDir && !canRead -> "----------"
+                            else -> "-rw-r--r--"
+                        }
+                        
+                        val size = when {
+                            isDir -> "4096"
+                            canRead -> try { file.length().toString().padStart(8) } catch (e: Exception) { "0".padStart(8) }
+                            else -> "?".padStart(8)
+                        }
+                        
                         val name = file.name
                         val date = "Jan 01 12:00"
                         val line = "$permissions 1 owner group $size $date $name"
-                        Log.d(TAG, "File entry: $line")
+                        
+                        Log.d(TAG, "Adding file entry: $line")
                         appendLine(line)
+                        
                     } catch (e: Exception) {
                         Log.e(TAG, "Error processing file: ${file.name}", e)
                     }
                 }
-                Log.d(TAG, "File list built successfully, ${files.size} items")
+                Log.d(TAG, "File list built successfully, final content length: ${this.length}")
             } catch (e: Exception) {
                 Log.e(TAG, "Error building file list", e)
             }

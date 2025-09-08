@@ -3,11 +3,16 @@ package com.mqftpserver.app
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
 import android.os.Looper
 import android.os.PowerManager
+import android.provider.Settings
 import android.view.View
 import android.view.WindowManager
 import android.widget.Button
@@ -15,16 +20,24 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import android.widget.ArrayAdapter
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import java.io.File
 import java.net.NetworkInterface
 import java.text.SimpleDateFormat
 import java.util.*
 import android.util.Log
+import android.Manifest
 
 // default activity
 class PancakeActivity : Activity() {
   private var ftpServer: SimpleFtpServer? = null
   private var wakeLock: PowerManager.WakeLock? = null
+  private val PERMISSION_REQUEST_CODE = 1001
+
+  companion object {
+    private const val TAG = "PancakeActivity"
+  }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -46,8 +59,12 @@ class PancakeActivity : Activity() {
     val btnStart = findViewById<Button>(R.id.btn_start_ftp)
     val btnStop = findViewById<Button>(R.id.btn_stop_ftp)
     val btnBrowse = findViewById<Button>(R.id.btn_browse_folder)
-    val btnListFiles = findViewById<Button>(R.id.btn_list_files)
-    val btnRefreshFiles = findViewById<Button>(R.id.btn_refresh_files)
+
+    // Vérifier les permissions avant de démarrer
+    if (!checkStoragePermissions()) {
+      requestStoragePermissions()
+      return@onCreate
+    }
 
     // Définir le dossier racine par défaut vers Videos
     val defaultFtpRoot = try {
@@ -84,15 +101,6 @@ class PancakeActivity : Activity() {
       showSimpleFolderPicker { selectedPath ->
         rootEdit?.setText(selectedPath)
       }
-    }
-
-    btnListFiles?.setOnClickListener {
-      val rootPath = rootEdit?.text?.toString() ?: File(applicationContext.filesDir, "ftp").absolutePath
-      showFileExplorer(File(rootPath))
-    }
-
-    btnRefreshFiles?.setOnClickListener {
-      Toast.makeText(this, "Fichiers actualisés", Toast.LENGTH_SHORT).show()
     }
 
     btnStart?.setOnClickListener {
@@ -133,6 +141,68 @@ class PancakeActivity : Activity() {
       statusText?.text = "⏹️ Serveur arrêté"
       statusText?.setTextColor(0xFFF44336.toInt()) // Rouge pour arrêt
       Toast.makeText(this, "Serveur FTP arrêté", Toast.LENGTH_SHORT).show()
+    }
+  }
+
+  private fun checkStoragePermissions(): Boolean {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+      // Android 11+ - Vérifier MANAGE_EXTERNAL_STORAGE
+      Environment.isExternalStorageManager()
+    } else {
+      // Android 10 et inférieur - Vérifier READ_EXTERNAL_STORAGE et WRITE_EXTERNAL_STORAGE
+      ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
+      ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+    }
+  }
+
+  private fun requestStoragePermissions() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+      // Android 11+ - Demander MANAGE_EXTERNAL_STORAGE
+      try {
+        val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+        intent.data = Uri.parse("package:$packageName")
+        startActivityForResult(intent, PERMISSION_REQUEST_CODE)
+        Toast.makeText(this, "Veuillez autoriser l'accès à tous les fichiers pour le serveur FTP", Toast.LENGTH_LONG).show()
+      } catch (e: Exception) {
+        Log.e(TAG, "Erreur lors de la demande de permission MANAGE_EXTERNAL_STORAGE", e)
+        // Fallback vers l'écran général des paramètres
+        val intent = Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
+        startActivityForResult(intent, PERMISSION_REQUEST_CODE)
+      }
+    } else {
+      // Android 10 et inférieur - Demander les permissions classiques
+      ActivityCompat.requestPermissions(this, 
+        arrayOf(
+          Manifest.permission.READ_EXTERNAL_STORAGE,
+          Manifest.permission.WRITE_EXTERNAL_STORAGE
+        ), 
+        PERMISSION_REQUEST_CODE
+      )
+    }
+  }
+
+  override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    super.onActivityResult(requestCode, resultCode, data)
+    if (requestCode == PERMISSION_REQUEST_CODE) {
+      if (checkStoragePermissions()) {
+        Toast.makeText(this, "Permissions accordées! Redémarrage de l'application recommandé.", Toast.LENGTH_LONG).show()
+        // Optionnel: Redémarrer automatiquement l'activité
+        recreate()
+      } else {
+        Toast.makeText(this, "Permissions refusées. Le serveur FTP pourrait avoir des limitations d'accès.", Toast.LENGTH_LONG).show()
+      }
+    }
+  }
+
+  override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    if (requestCode == PERMISSION_REQUEST_CODE) {
+      if (grantResults.isNotEmpty() && grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
+        Toast.makeText(this, "Permissions accordées!", Toast.LENGTH_SHORT).show()
+        recreate()
+      } else {
+        Toast.makeText(this, "Permissions refusées. Le serveur FTP pourrait avoir des limitations d'accès.", Toast.LENGTH_LONG).show()
+      }
     }
   }
 
@@ -295,134 +365,6 @@ class PancakeActivity : Activity() {
       }
       .setNegativeButton("Annuler", null)
       .show()
-  }
-
-  private fun showFileExplorer(directory: File) {
-    try {
-      if (!directory.exists()) {
-        Toast.makeText(this, "Le dossier n'existe pas", Toast.LENGTH_SHORT).show()
-        return
-      }
-
-      val files = directory.listFiles()?.sortedWith(compareBy({ !it.isDirectory }, { it.name })) ?: emptyList()
-      
-      if (files.isEmpty()) {
-        Toast.makeText(this, "Dossier vide", Toast.LENGTH_SHORT).show()
-        return
-      }
-
-      val fileItems = mutableListOf<String>()
-      
-      // Ajouter le parent directory si ce n'est pas la racine
-      val rootPath = File(findViewById<EditText>(R.id.ftp_root)?.text?.toString() ?: "").absolutePath
-      if (directory.absolutePath != rootPath) {
-        fileItems.add("📁 .. (Dossier parent)")
-      }
-      
-      files.forEach { file ->
-        val icon = if (file.isDirectory) "📁" else "📄"
-        val size = if (file.isDirectory) "" else " (${formatFileSize(file.length())})"
-        fileItems.add("$icon ${file.name}$size")
-      }
-
-      AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog)
-        .setTitle("Fichiers dans: ${getRelativePathForDisplay(directory)}")
-        .setItems(fileItems.toTypedArray()) { _, which ->
-          var actualIndex = which
-          
-          // Si on a ajouté le parent directory, ajuster l'index
-          if (directory.absolutePath != rootPath) {
-            if (which == 0) {
-              // Retour au dossier parent
-              showFileExplorer(directory.parentFile ?: directory)
-              return@setItems
-            }
-            actualIndex = which - 1
-          }
-          
-          val selectedFile = files[actualIndex]
-          if (selectedFile.isDirectory) {
-            showFileExplorer(selectedFile)
-          } else {
-            showFileInfo(selectedFile)
-          }
-        }
-        .setNegativeButton("Fermer", null)
-        .setNeutralButton("Créer dossier") { _, _ ->
-          showCreateFolderDialog(directory)
-        }
-        .show()
-    } catch (e: Exception) {
-      Toast.makeText(this, "Erreur: ${e.message}", Toast.LENGTH_LONG).show()
-    }
-  }
-
-  private fun showFileInfo(file: File) {
-    val info = buildString {
-      appendLine("Nom: ${file.name}")
-      appendLine("Taille: ${formatFileSize(file.length())}")
-      appendLine("Modifié: ${java.text.SimpleDateFormat("dd/MM/yyyy HH:mm", java.util.Locale.getDefault()).format(file.lastModified())}")
-      appendLine("Chemin: ${file.absolutePath}")
-      appendLine("Lecture: ${if (file.canRead()) "Oui" else "Non"}")
-      appendLine("Écriture: ${if (file.canWrite()) "Oui" else "Non"}")
-    }
-
-    AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog)
-      .setTitle("Informations du fichier")
-      .setMessage(info)
-      .setPositiveButton("OK", null)
-      .setNegativeButton("Supprimer") { _, _ ->
-        if (file.delete()) {
-          Toast.makeText(this, "Fichier supprimé", Toast.LENGTH_SHORT).show()
-        } else {
-          Toast.makeText(this, "Impossible de supprimer le fichier", Toast.LENGTH_SHORT).show()
-        }
-      }
-      .show()
-  }
-
-  private fun showCreateFolderDialog(parentDir: File) {
-    val input = EditText(this)
-    input.hint = "Nom du nouveau dossier"
-    input.setTextColor(0xFF000000.toInt())
-
-    AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog)
-      .setTitle("Créer un nouveau dossier")
-      .setView(input)
-      .setPositiveButton("Créer") { _, _ ->
-        val folderName = input.text.toString().trim()
-        if (folderName.isNotEmpty()) {
-          val newFolder = File(parentDir, folderName)
-          if (newFolder.mkdirs()) {
-            Toast.makeText(this, "Dossier créé: $folderName", Toast.LENGTH_SHORT).show()
-          } else {
-            Toast.makeText(this, "Impossible de créer le dossier", Toast.LENGTH_SHORT).show()
-          }
-        }
-      }
-      .setNegativeButton("Annuler", null)
-      .show()
-  }
-
-  private fun formatFileSize(bytes: Long): String {
-    if (bytes < 1024) return "$bytes B"
-    val kb = bytes / 1024.0
-    if (kb < 1024) return "%.1f KB".format(kb)
-    val mb = kb / 1024.0
-    if (mb < 1024) return "%.1f MB".format(mb)
-    val gb = mb / 1024.0
-    return "%.1f GB".format(gb)
-  }
-
-  private fun getRelativePathForDisplay(directory: File): String {
-    val rootPath = File(findViewById<EditText>(R.id.ftp_root)?.text?.toString() ?: "").absolutePath
-    val currentPath = directory.absolutePath
-    return if (currentPath.startsWith(rootPath)) {
-      val relativePath = currentPath.substring(rootPath.length)
-      if (relativePath.isEmpty()) "/" else relativePath.replace(File.separator, "/")
-    } else {
-      currentPath
-    }
   }
 
   private fun startFtpServerAutomatically(
