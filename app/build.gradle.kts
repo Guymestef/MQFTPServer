@@ -27,16 +27,43 @@ android {
 
     // Update the ndkVersion to the right version for your app
     // ndkVersion = "27.0.12077973"
+    
+    // Fix for 16 KB page size compatibility
+    ndk {
+      debugSymbolLevel = "NONE"
+    }
   }
 
-  packaging { resources.excludes.add("META-INF/LICENSE") }
+  packaging { 
+    resources.excludes.add("META-INF/LICENSE")
+    
+    // 16 KB page size compatibility
+    jniLibs {
+      useLegacyPackaging = false
+    }
+  }
 
   lint { abortOnError = false }
 
   buildTypes {
+    debug {
+      isMinifyEnabled = false
+      // Force 16 KB alignment for debug builds
+      packaging {
+        jniLibs {
+          useLegacyPackaging = false
+        }
+      }
+    }
     release {
       isMinifyEnabled = false
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+      // Force 16 KB alignment for release builds
+      packaging {
+        jniLibs {
+          useLegacyPackaging = false
+        }
+      }
     }
   }
   buildFeatures { buildConfig = true }
@@ -46,6 +73,13 @@ android {
     targetCompatibility = JavaVersion.VERSION_17
   }
   kotlinOptions { jvmTarget = "17" }
+  
+  // Additional NDK configuration for 16KB page size compatibility
+  androidComponents {
+    onVariants(selector().all()) { variant ->
+      variant.packaging.jniLibs.useLegacyPackaging.set(false)
+    }
+  }
 }
 
 //noinspection UseTomlInstead

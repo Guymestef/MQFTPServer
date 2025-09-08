@@ -18,7 +18,8 @@ dependencyResolutionManagement {
   repositories {
     mavenCentral()
     google()
-    jcenter() // Warning: this repository is going to shut down soon
+    // jcenter() has been deprecated and removed
+    // All dependencies should be available through mavenCentral() and google()
   }
 }
 
