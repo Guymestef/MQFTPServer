@@ -11,7 +11,7 @@
         android:orientation="vertical"
         android:padding="20dp">
 
-        <!-- En-tête -->
+        <!-- Header -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -24,7 +24,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="🥽"
+                android:text="@string/vr_icon"
                 android:textSize="48sp"
                 android:layout_marginEnd="16dp" />
 
@@ -37,7 +37,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="MQ FTP Server"
+                    android:text="@string/app_name"
                     android:textSize="28sp"
                     android:textStyle="bold"
                     android:textColor="@color/primary_blue" />
@@ -45,7 +45,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Optimisé pour Meta Quest 3"
+                    android:text="@string/app_subtitle"
                     android:textSize="16sp"
                     android:textColor="@color/text_secondary"
                     android:layout_marginTop="4dp" />
@@ -61,7 +61,7 @@
                     android:id="@+id/server_status"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="⏹️ Arrêté"
+                    android:text="@string/server_stopped"
                     android:textSize="18sp"
                     android:textStyle="bold"
                     android:textColor="@color/status_error"
@@ -72,7 +72,7 @@
                     android:id="@+id/ip_address"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="📱 IP: Recherche..."
+                    android:text="@string/ip_searching"
                     android:textSize="14sp"
                     android:textColor="@color/status_info"
                     android:layout_marginTop="8dp"
@@ -80,206 +80,213 @@
             </LinearLayout>
         </LinearLayout>
 
-        <!-- Configuration et contrôles en 2 colonnes -->
+        <!-- Configuration and controls -->
         <LinearLayout
+            style="@style/CardStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="2">
+            android:orientation="vertical">
 
-            <!-- Colonne gauche : Configuration -->
-            <LinearLayout
-                style="@style/CardStyle"
-                android:layout_width="0dp"
-                android:layout_weight="1"
+            <!-- Configuration Section -->
+            <TextView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="10dp"
-                android:orientation="vertical">
+                android:layout_marginBottom="16dp"
+                android:text="@string/configuration_title"
+                android:textColor="@color/primary_blue"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <!-- Row 1: Username, Password and Port -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="6dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/username_label"
+                        android:textColor="@color/text_primary"
+                        android:textStyle="bold" />
+
+                    <EditText
+                        android:id="@+id/ftp_user"
+                        style="@style/EditTextStyle"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:hint="@string/username_hint"
+                        android:text="@string/default_username"
+                        android:minHeight="48dp"
+                        android:gravity="center_vertical" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="3dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/password_label"
+                        android:textColor="@color/text_primary"
+                        android:textStyle="bold" />
+
+                    <EditText
+                        android:id="@+id/ftp_password"
+                        style="@style/EditTextStyle"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:hint="@string/password_hint"
+                        android:inputType="textPassword"
+                        android:text="@string/default_password"
+                        android:minHeight="48dp"
+                        android:gravity="center_vertical" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:layout_weight="0.6"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/port_label"
+                        android:textColor="@color/text_primary"
+                        android:textStyle="bold" />
+
+                    <EditText
+                        android:id="@+id/ftp_port"
+                        style="@style/EditTextStyle"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:hint="@string/port_hint"
+                        android:inputType="number"
+                        android:text="@string/default_port"
+                        android:minHeight="48dp"
+                        android:gravity="center_vertical" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Row 2: Root folder -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="24dp">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="⚙️ Configuration"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/primary_blue"
-                    android:layout_marginBottom="16dp" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_marginEnd="8dp">
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="🔌 Port"
-                            android:textStyle="bold"
-                            android:textColor="@color/text_primary" />
-
-                        <EditText
-                            android:id="@+id/ftp_port"
-                            style="@style/EditTextStyle"
-                            android:layout_width="match_parent"
-                            android:layout_height="48dp"
-                            android:hint="2121"
-                            android:inputType="number"
-                            android:text="2121" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_marginStart="8dp">
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="👤 Utilisateur"
-                            android:textStyle="bold"
-                            android:textColor="@color/text_primary" />
-
-                        <EditText
-                            android:id="@+id/ftp_user"
-                            style="@style/EditTextStyle"
-                            android:layout_width="match_parent"
-                            android:layout_height="48dp"
-                            android:hint="admin"
-                            android:text="admin" />
-                    </LinearLayout>
-                </LinearLayout>
+                    android:text="@string/root_folder_label"
+                    android:textColor="@color/text_primary"
+                    android:textStyle="bold" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_marginTop="12dp">
+                    android:layout_marginTop="4dp">
 
-                    <LinearLayout
+                    <EditText
+                        android:id="@+id/ftp_root"
+                        style="@style/EditTextStyle"
                         android:layout_width="0dp"
+                        android:layout_height="48dp"
                         android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_marginEnd="8dp">
+                        android:layout_marginEnd="8dp"
+                        android:hint="@string/root_path_hint"
+                        android:textSize="12sp"
+                        android:minHeight="48dp"
+                        android:gravity="center_vertical" />
 
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="🔒 Mot de passe"
-                            android:textStyle="bold"
-                            android:textColor="@color/text_primary" />
-
-                        <EditText
-                            android:id="@+id/ftp_password"
-                            style="@style/EditTextStyle"
-                            android:layout_width="match_parent"
-                            android:layout_height="48dp"
-                            android:hint="password"
-                            android:text="password"
-                            android:inputType="textPassword" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_marginStart="8dp">
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="📁 Dossier"
-                            android:textStyle="bold"
-                            android:textColor="@color/text_primary" />
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="48dp"
-                            android:orientation="horizontal">
-
-                            <EditText
-                                android:id="@+id/ftp_root"
-                                style="@style/EditTextStyle"
-                                android:layout_width="0dp"
-                                android:layout_weight="1"
-                                android:layout_height="match_parent"
-                                android:hint="/Movies/ftp"
-                                android:textSize="12sp"
-                                android:layout_marginEnd="4dp" />
-
-                            <Button
-                                android:id="@+id/btn_browse_folder"
-                                style="@style/SecondaryButtonStyle"
-                                android:layout_width="60dp"
-                                android:layout_height="match_parent"
-                                android:text="📂" />
-                        </LinearLayout>
-                    </LinearLayout>
+                    <Button
+                        android:id="@+id/btn_browse_folder"
+                        style="@style/SecondaryButtonStyle"
+                        android:layout_width="56dp"
+                        android:layout_height="48dp"
+                        android:text="@string/browse_button"
+                        android:minHeight="48dp"
+                        android:gravity="center" />
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- Colonne droite : Contrôles -->
-            <LinearLayout
-                style="@style/CardStyle"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:orientation="vertical">
+            <!-- Séparateur -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/text_secondary"
+                android:alpha="0.3"
+                android:layout_marginVertical="16dp" />
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="🎮 Contrôles"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/primary_blue"
-                    android:layout_marginBottom="16dp" />
+            <!-- Server Controls Section -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="@string/server_controls_title"
+                android:textColor="@color/primary_blue"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <!-- Horizontal button layout -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="20dp">
 
                 <Button
                     android:id="@+id/btn_start_ftp"
                     style="@style/PrimaryButtonStyle"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="56dp"
-                    android:text="🚀 Démarrer le serveur"
-                    android:textSize="18sp"
-                    android:layout_marginBottom="12dp" />
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    android:text="@string/start_server_button"
+                    android:textSize="16sp" />
 
                 <Button
                     android:id="@+id/btn_stop_ftp"
                     style="@style/DangerButtonStyle"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="56dp"
-                    android:text="⏹️ Arrêter le serveur"
-                    android:textSize="18sp"
-                    android:layout_marginBottom="20dp" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="📡 Connexion FTP"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/text_primary"
-                    android:layout_marginBottom="8dp" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Utilisez FileZilla ou WinSCP avec l'IP et le port affichés ci-dessus"
-                    android:textSize="14sp"
-                    android:textColor="@color/text_secondary" />
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:text="@string/stop_server_button"
+                    android:textSize="16sp" />
             </LinearLayout>
+
+            <!-- Connection information -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="@string/ftp_connection_title"
+                android:textColor="@color/text_primary"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/connection_instructions"
+                android:textColor="@color/text_secondary"
+                android:textSize="14sp" />
         </LinearLayout>
 
     </LinearLayout>

@@ -1,3 +1,66 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <!-- App Title and Header -->
+    <string name="app_name">MQ FTP Server</string>
+    <string name="vr_icon">🥽</string>
+    <string name="app_subtitle">Optimized for Meta Quest 3</string>
+    
+    <!-- Server Status -->
+    <string name="server_stopped">⏹️ Stopped</string>
+    <string name="server_running">🚀 Running</string>
+    <string name="ip_searching">📱 IP: Searching…</string>
+    
+    <!-- Configuration Section -->
+    <string name="configuration_title">⚙️ Configuration</string>
+    <string name="username_label">👤 Username</string>
+    <string name="password_label">🔒 Password</string>
+    <string name="port_label">🔌 Port</string>
+    <string name="root_folder_label">📁 Root folder</string>
+    <string name="browse_button">📂</string>
+    
+    <!-- Default Values -->
+    <string name="default_username">admin</string>
+    <string name="default_password">password</string>
+    <string name="default_port">2121</string>
+    <string name="default_root_path">/Movies/ftp</string>
+    
+    <!-- Hints -->
+    <string name="username_hint">admin</string>
+    <string name="password_hint">password</string>
+    <string name="port_hint">2121</string>
+    <string name="root_path_hint">/Movies/ftp</string>
+    
+    <!-- Server Controls -->
+    <string name="server_controls_title">Server Controls</string>
+    <string name="start_server_button">🚀 Start Server</string>
+    <string name="stop_server_button">⏹️ Stop Server</string>
+    
+    <!-- Connection Info -->
+    <string name="ftp_connection_title">📡 FTP Connection</string>
+    <string name="connection_instructions">Use FileZilla or WinSCP with the IP and port displayed above</string>
+    
+    <!-- Dynamic Status Messages -->
+    <string name="server_running_on">✅ Server running on %1$s:%2$s</string>
+    <string name="server_stopped_status">⏹️ Server stopped</string>
+    <string name="server_auto_started">🚀 Server auto-started on %1$s:%2$s</string>
+    <string name="server_start_error">❌ Start error: %1$s</string>
+    <string name="local_ip_format">Local IP: %1$s</string>
+    
+    <!-- Permissions Messages -->
+    <string name="permission_request_all_files">Please allow access to all files for the FTP server</string>
+    <string name="permissions_granted_restart">Permissions granted! Application restart recommended.</string>
+    <string name="permissions_denied_limitations">Permissions denied. The FTP server might have access limitations.</string>
+    <string name="permissions_granted">Permissions granted!</string>
+    
+    <!-- Folder Browser -->
+    <string name="folder_browser_title">📁 Folder Browser\n📍 %1$s</string>
+    <string name="folder_selected">Folder selected: %1$s</string>
+    <string name="folder_access_error">Folder access error: %1$s</string>
+    <string name="folder_selector_error">Folder selector error: %1$s</string>
+    <string name="create_new_folder_title">📁 Create new folder</string>
+    <string name="create_folder_location">In: %1$s</string>
+    <string name="folder_created">✅ Folder created: %1$s</string>
+    <string name="folder_creation_failed">❌ Cannot create folder</string>
+    <string name="folder_creation_error">❌ Error: %1$s</string>
+    <string name="enter_folder_name">⚠️ Please enter a name</string>
 </resources>

@@ -58,5 +58,8 @@
     <item name="android:padding">12dp</item>
     <item name="android:layout_marginVertical">4dp</item>
     <item name="android:textSize">14sp</item>
+    <item name="android:minHeight">48dp</item>
+    <item name="android:gravity">center_vertical</item>
+    <item name="android:includeFontPadding">false</item>
   </style>
 </resources>

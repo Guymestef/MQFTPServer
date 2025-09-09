@@ -44,10 +44,10 @@ class PancakeActivity : Activity() {
     this.setTheme(R.style.PanelAppThemeTransparent)
     setContentView(R.layout.ui_pancake_modern)
 
-    // Empêcher la mise en veille pour maintenir le serveur FTP actif
+    // Prevent sleep to keep FTP server active
     setupWakeLock()
     
-    // Garder l'écran allumé
+    // Keep screen on
     window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
     val portEdit = findViewById<EditText>(R.id.ftp_port)
@@ -60,42 +60,42 @@ class PancakeActivity : Activity() {
     val btnStop = findViewById<Button>(R.id.btn_stop_ftp)
     val btnBrowse = findViewById<Button>(R.id.btn_browse_folder)
 
-    // Vérifier les permissions avant de démarrer
+    // Check permissions before starting
     if (!checkStoragePermissions()) {
       requestStoragePermissions()
       return@onCreate
     }
 
-    // Définir le dossier racine par défaut vers Videos
+    // Set default root folder to Videos
     val defaultFtpRoot = try {
       val videosDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES)
       if (videosDir.exists() || videosDir.mkdirs()) {
         File(videosDir, "ftp").absolutePath
       } else {
-        // Fallback vers le dossier interne si Videos n'est pas accessible
+        // Fallback to internal folder if Videos is not accessible
         File(applicationContext.filesDir, "ftp").absolutePath
       }
     } catch (e: Exception) {
-      Log.e("FTP", "Erreur lors de l'accès au dossier Videos", e)
+      Log.e("FTP", "Error accessing Videos folder", e)
       File(applicationContext.filesDir, "ftp").absolutePath
     }
     
     rootEdit?.setText(defaultFtpRoot)
 
-    // Pré-remplir les champs avec les valeurs par défaut
-    portEdit?.setText("2121")
-    userEdit?.setText("admin")
-    passEdit?.setText("password")
+    // Pre-fill fields with default values
+    portEdit?.setText(getString(R.string.default_port))
+    userEdit?.setText(getString(R.string.default_username))
+    passEdit?.setText(getString(R.string.default_password))
 
-    // Afficher l'adresse IP locale
+    // Display local IP address
     val localIP = getLocalIPAddress()
-    ipText?.text = "IP locale: $localIP"
+    ipText?.text = getString(R.string.local_ip_format, localIP)
 
-    // Démarrer automatiquement le serveur FTP après un court délai
-    // pour s'assurer que l'interface est complètement initialisée
+    // Start FTP server automatically after a short delay
+    // to ensure the interface is completely initialized
     Handler(Looper.getMainLooper()).postDelayed({
       startFtpServerAutomatically(portEdit, userEdit, passEdit, rootEdit, statusText, localIP)
-    }, 1000) // Délai de 1 seconde
+    }, 1000) // 1 second delay
 
     btnBrowse?.setOnClickListener {
       showSimpleFolderPicker { selectedPath ->
@@ -115,41 +115,41 @@ class PancakeActivity : Activity() {
         val rootDir = File(rootPath)
         if (!rootDir.exists()) {
           rootDir.mkdirs()
-          // Créer quelques fichiers de test
+          // Create some test files
           createTestFiles(rootDir)
         }
 
         ftpServer = SimpleFtpServer(port, user, pass, rootDir)
         ftpServer?.start()
         
-        // S'assurer que le WakeLock est actif pour maintenir le serveur
+        // Ensure WakeLock is active to maintain the server
         if (wakeLock?.isHeld != true) {
           setupWakeLock()
         }
         
-        statusText?.text = "✅ Serveur actif sur $localIP:$port"
-        statusText?.setTextColor(0xFF4CAF50.toInt()) // Vert pour succès
-        Toast.makeText(this, "Serveur FTP démarré sur $localIP:$port", Toast.LENGTH_LONG).show()
+        statusText?.text = getString(R.string.server_running_on, localIP, port)
+        statusText?.setTextColor(0xFF4CAF50.toInt()) // Green for success
+        Toast.makeText(this, getString(R.string.server_running_on, localIP, port), Toast.LENGTH_LONG).show()
       } catch (e: Exception) {
-        Toast.makeText(this, "Erreur: ${e.message}", Toast.LENGTH_LONG).show()
+        Toast.makeText(this, getString(R.string.server_start_error, e.message ?: "Unknown"), Toast.LENGTH_LONG).show()
       }
     }
 
     btnStop?.setOnClickListener {
       ftpServer?.stop()
       ftpServer = null
-      statusText?.text = "⏹️ Serveur arrêté"
-      statusText?.setTextColor(0xFFF44336.toInt()) // Rouge pour arrêt
-      Toast.makeText(this, "Serveur FTP arrêté", Toast.LENGTH_SHORT).show()
+      statusText?.text = getString(R.string.server_stopped_status)
+      statusText?.setTextColor(0xFFF44336.toInt()) // Red for stopped
+      Toast.makeText(this, getString(R.string.server_stopped_status), Toast.LENGTH_SHORT).show()
     }
   }
 
   private fun checkStoragePermissions(): Boolean {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-      // Android 11+ - Vérifier MANAGE_EXTERNAL_STORAGE
+      // Android 11+ - Check MANAGE_EXTERNAL_STORAGE
       Environment.isExternalStorageManager()
     } else {
-      // Android 10 et inférieur - Vérifier READ_EXTERNAL_STORAGE et WRITE_EXTERNAL_STORAGE
+      // Android 10 and below - Check READ_EXTERNAL_STORAGE and WRITE_EXTERNAL_STORAGE
       ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
       ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
     }
@@ -157,20 +157,20 @@ class PancakeActivity : Activity() {
 
   private fun requestStoragePermissions() {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-      // Android 11+ - Demander MANAGE_EXTERNAL_STORAGE
+      // Android 11+ - Request MANAGE_EXTERNAL_STORAGE
       try {
         val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
         intent.data = Uri.parse("package:$packageName")
         startActivityForResult(intent, PERMISSION_REQUEST_CODE)
-        Toast.makeText(this, "Veuillez autoriser l'accès à tous les fichiers pour le serveur FTP", Toast.LENGTH_LONG).show()
+        Toast.makeText(this, getString(R.string.permission_request_all_files), Toast.LENGTH_LONG).show()
       } catch (e: Exception) {
-        Log.e(TAG, "Erreur lors de la demande de permission MANAGE_EXTERNAL_STORAGE", e)
-        // Fallback vers l'écran général des paramètres
+        Log.e(TAG, "Error requesting MANAGE_EXTERNAL_STORAGE permission", e)
+        // Fallback to general settings screen
         val intent = Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
         startActivityForResult(intent, PERMISSION_REQUEST_CODE)
       }
     } else {
-      // Android 10 et inférieur - Demander les permissions classiques
+      // Android 10 and below - Request classic permissions
       ActivityCompat.requestPermissions(this, 
         arrayOf(
           Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -185,11 +185,11 @@ class PancakeActivity : Activity() {
     super.onActivityResult(requestCode, resultCode, data)
     if (requestCode == PERMISSION_REQUEST_CODE) {
       if (checkStoragePermissions()) {
-        Toast.makeText(this, "Permissions accordées! Redémarrage de l'application recommandé.", Toast.LENGTH_LONG).show()
-        // Optionnel: Redémarrer automatiquement l'activité
+        Toast.makeText(this, getString(R.string.permissions_granted_restart), Toast.LENGTH_LONG).show()
+        // Optional: Automatically restart the activity
         recreate()
       } else {
-        Toast.makeText(this, "Permissions refusées. Le serveur FTP pourrait avoir des limitations d'accès.", Toast.LENGTH_LONG).show()
+        Toast.makeText(this, getString(R.string.permissions_denied_limitations), Toast.LENGTH_LONG).show()
       }
     }
   }
@@ -198,10 +198,10 @@ class PancakeActivity : Activity() {
     super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     if (requestCode == PERMISSION_REQUEST_CODE) {
       if (grantResults.isNotEmpty() && grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
-        Toast.makeText(this, "Permissions accordées!", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, getString(R.string.permissions_granted), Toast.LENGTH_SHORT).show()
         recreate()
       } else {
-        Toast.makeText(this, "Permissions refusées. Le serveur FTP pourrait avoir des limitations d'accès.", Toast.LENGTH_LONG).show()
+        Toast.makeText(this, getString(R.string.permissions_denied_limitations), Toast.LENGTH_LONG).show()
       }
     }
   }
@@ -222,12 +222,12 @@ class PancakeActivity : Activity() {
         try {
           val folders = mutableListOf<Pair<String, File>>()
           
-          // Ajouter l'option de remonter si possible
+          // Add option to go up if possible
           currentDirectory.parent?.let { parent ->
-            folders.add(Pair("⬆️ Dossier parent", File(parent)))
+            folders.add(Pair("⬆️ Parent folder", File(parent)))
           }
           
-          // Ajouter les dossiers du répertoire actuel
+          // Add folders from current directory
           currentDirectory.listFiles()?.let { files ->
             files.filter { it.isDirectory && it.canRead() }
               .sortedBy { it.name.lowercase() }
@@ -237,79 +237,79 @@ class PancakeActivity : Activity() {
               }
           }
           
-          // Ajouter l'option de sélectionner le dossier actuel
-          folders.add(0, Pair("✅ Sélectionner ce dossier: ${currentDirectory.name}", currentDirectory))
+          // Add option to select current folder
+          folders.add(0, Pair("✅ Select this folder: ${currentDirectory.name}", currentDirectory))
           
           val folderNames = folders.map { it.first }.toTypedArray()
           
           AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog)
-            .setTitle("📁 Navigateur de dossiers\n📍 ${currentDirectory.absolutePath}")
+            .setTitle(getString(R.string.folder_browser_title, currentDirectory.absolutePath))
             .setItems(folderNames) { _, which ->
               val selectedFolder = folders[which].second
               if (which == 0) {
-                // Sélectionner le dossier actuel
+                // Select current folder
                 onFolderSelected(currentDirectory.absolutePath)
-                Toast.makeText(this, "Dossier sélectionné: ${currentDirectory.absolutePath}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.folder_selected, currentDirectory.absolutePath), Toast.LENGTH_SHORT).show()
               } else {
-                // Naviguer vers le dossier sélectionné
+                // Navigate to selected folder
                 currentDirectory = selectedFolder
-                showFolderDialog() // Récursion pour continuer la navigation
+                showFolderDialog() // Recursion to continue navigation
               }
             }
-            .setNeutralButton("📁 Nouveau dossier") { _, _ ->
+            .setNeutralButton("📁 New folder") { _, _ ->
               showCreateFolderDialog(currentDirectory) {
-                showFolderDialog() // Rafraîchir après création
+                showFolderDialog() // Refresh after creation
               }
             }
-            .setNegativeButton("❌ Annuler", null)
+            .setNegativeButton("❌ Cancel", null)
             .show()
         } catch (e: Exception) {
-          Log.e("FTP", "Erreur dans showFolderDialog", e)
-          Toast.makeText(this, "Erreur d'accès au dossier: ${e.message}", Toast.LENGTH_LONG).show()
+          Log.e("FTP", "Error in showFolderDialog", e)
+          Toast.makeText(this, getString(R.string.folder_access_error, e.message ?: "Unknown"), Toast.LENGTH_LONG).show()
         }
       }
       
       showFolderDialog()
     } catch (e: Exception) {
-      Log.e("FTP", "Erreur dans showSimpleFolderPicker", e)
-      Toast.makeText(this, "Erreur du sélecteur de dossier: ${e.message}", Toast.LENGTH_LONG).show()
+      Log.e("FTP", "Error in showSimpleFolderPicker", e)
+      Toast.makeText(this, getString(R.string.folder_selector_error, e.message ?: "Unknown"), Toast.LENGTH_LONG).show()
     }
   }
 
   private fun showCreateFolderDialog(parentDirectory: File, onSuccess: () -> Unit) {
     try {
       val input = EditText(this)
-      input.hint = "Nom du nouveau dossier"
+      input.hint = "New folder name"
       input.setPadding(50, 30, 50, 30)
       
       AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog)
-        .setTitle("📁 Créer un nouveau dossier")
-        .setMessage("Dans: ${parentDirectory.absolutePath}")
+        .setTitle(getString(R.string.create_new_folder_title))
+        .setMessage(getString(R.string.create_folder_location, parentDirectory.absolutePath))
         .setView(input)
-        .setPositiveButton("✅ Créer") { _, _ ->
+        .setPositiveButton("✅ Create") { _, _ ->
           val folderName = input.text.toString().trim()
           if (folderName.isNotEmpty()) {
             try {
               val newFolder = File(parentDirectory, folderName)
               if (newFolder.mkdir()) {
                 onSuccess()
-                Toast.makeText(this, "✅ Dossier créé: $folderName", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.folder_created, folderName), Toast.LENGTH_SHORT).show()
               } else {
-                Toast.makeText(this, "❌ Impossible de créer le dossier", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.folder_creation_failed), Toast.LENGTH_SHORT).show()
               }
             } catch (e: Exception) {
-              Log.e("FTP", "Erreur création dossier", e)
-              Toast.makeText(this, "❌ Erreur: ${e.message}", Toast.LENGTH_SHORT).show()
+              Log.e("FTP", "Folder creation error", e)
+              Toast.makeText(this, getString(R.string.folder_creation_error, e.message ?: "Unknown"), Toast.LENGTH_SHORT).show()
             }
           } else {
-            Toast.makeText(this, "⚠️ Veuillez entrer un nom", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.enter_folder_name), Toast.LENGTH_SHORT).show()
           }
         }
-        .setNegativeButton("❌ Annuler", null)
+        .setNegativeButton("❌ Cancel", null)
         .show()
     } catch (e: Exception) {
-      Log.e("FTP", "Erreur dans showCreateFolderDialog", e)
-      Toast.makeText(this, "Erreur du dialog: ${e.message}", Toast.LENGTH_LONG).show()
+      Log.e("FTP", "Error in showCreateFolderDialog", e)
+      Toast.makeText(this, "Dialog error: ${e.message}", Toast.LENGTH_LONG).show()
     }
   }
 
@@ -318,20 +318,20 @@ class PancakeActivity : Activity() {
   private fun showFolderSelector(onFolderSelected: (String) -> Unit) {
     val commonFolders = mutableListOf<Pair<String, String>>()
     
-    // Ajouter Videos en premier (dossier par défaut)
+    // Add Videos first (default folder)
     try {
       val videosDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES)
-      commonFolders.add(Pair("📹 Videos (par défaut)", videosDir.absolutePath))
+      commonFolders.add(Pair("📹 Videos (default)", videosDir.absolutePath))
     } catch (e: Exception) {
-      Log.e("FTP", "Erreur d'accès au dossier Videos", e)
+      Log.e("FTP", "Error accessing Videos folder", e)
     }
     
-    // Ajouter les autres dossiers disponibles
-    commonFolders.add(Pair("App interne", applicationContext.filesDir.absolutePath))
+    // Add other available folders
+    commonFolders.add(Pair("Internal App", applicationContext.filesDir.absolutePath))
     
     val externalFilesDir = applicationContext.getExternalFilesDir(null)
     if (externalFilesDir != null) {
-      commonFolders.add(Pair("App externe", externalFilesDir.absolutePath))
+      commonFolders.add(Pair("External App", externalFilesDir.absolutePath))
     }
     
     try {
@@ -340,30 +340,30 @@ class PancakeActivity : Activity() {
       commonFolders.add(Pair("Pictures", Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).absolutePath))
       commonFolders.add(Pair("Music", Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC).absolutePath))
       commonFolders.add(Pair("DCIM", Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).absolutePath))
-      commonFolders.add(Pair("Stockage externe", Environment.getExternalStorageDirectory().absolutePath))
+      commonFolders.add(Pair("External Storage", Environment.getExternalStorageDirectory().absolutePath))
     } catch (e: Exception) {
-      // Ignorer les erreurs d'accès aux dossiers
+      // Ignore folder access errors
     }
 
     val folderNames = commonFolders.map { "${it.first}\n${it.second}" }.toTypedArray()
     
     AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog)
-      .setTitle("Sélectionner un dossier")
+      .setTitle("Select a folder")
       .setItems(folderNames) { _, which ->
         val selectedFolder = commonFolders[which].second
-        // Créer un sous-dossier 'ftp' dans le dossier sélectionné
+        // Create an 'ftp' subfolder in the selected folder
         val ftpFolder = File(selectedFolder, "ftp")
         try {
           if (!ftpFolder.exists()) {
             ftpFolder.mkdirs()
           }
           onFolderSelected(ftpFolder.absolutePath)
-          Toast.makeText(this, "Dossier sélectionné: ${ftpFolder.absolutePath}", Toast.LENGTH_SHORT).show()
+          Toast.makeText(this, "Folder selected: ${ftpFolder.absolutePath}", Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
-          Toast.makeText(this, "Erreur d'accès au dossier: ${e.message}", Toast.LENGTH_LONG).show()
+          Toast.makeText(this, "Folder access error: ${e.message}", Toast.LENGTH_LONG).show()
         }
       }
-      .setNegativeButton("Annuler", null)
+      .setNegativeButton("Cancel", null)
       .show()
   }
 
@@ -375,10 +375,10 @@ class PancakeActivity : Activity() {
     statusText: TextView?,
     localIP: String
   ) {
-    Log.i("FTP", "Tentative de démarrage automatique du serveur FTP...")
+    Log.i("FTP", "Attempting automatic FTP server startup...")
     
     try {
-      // Utiliser les valeurs par défaut ou celles dans les champs
+      // Use default values or those in the fields
       val port = portEdit?.text?.toString()?.toIntOrNull() ?: 2121
       val user = userEdit?.text?.toString()?.ifBlank { "admin" } ?: "admin"
       val pass = passEdit?.text?.toString()?.ifBlank { "password" } ?: "password"
@@ -390,45 +390,45 @@ class PancakeActivity : Activity() {
 
       val rootDir = File(rootPath)
       if (!rootDir.exists()) {
-        Log.i("FTP", "Création du dossier racine: ${rootDir.absolutePath}")
+        Log.i("FTP", "Creating root folder: ${rootDir.absolutePath}")
         val created = rootDir.mkdirs()
-        Log.i("FTP", "Dossier créé: $created")
+        Log.i("FTP", "Folder created: $created")
         if (created) {
-          // Créer quelques fichiers de test
+          // Create some test files
           createTestFiles(rootDir)
         }
       } else {
-        Log.i("FTP", "Dossier racine existe déjà: ${rootDir.absolutePath}")
+        Log.i("FTP", "Root folder already exists: ${rootDir.absolutePath}")
       }
 
-      // Arrêter le serveur précédent s'il existe
+      // Stop previous server if it exists
       if (ftpServer != null) {
-        Log.i("FTP", "Arrêt du serveur précédent...")
+        Log.i("FTP", "Stopping previous server...")
         ftpServer?.stop()
         ftpServer = null
       }
       
-      // Démarrer le nouveau serveur
-      Log.i("FTP", "Création et démarrage du nouveau serveur...")
+      // Start the new server
+      Log.i("FTP", "Creating and starting new server...")
       ftpServer = SimpleFtpServer(port, user, pass, rootDir)
       ftpServer?.start()
       
-      // S'assurer que le WakeLock est actif pour maintenir le serveur
+      // Ensure WakeLock is active to maintain the server
       if (wakeLock?.isHeld != true) {
         setupWakeLock()
       }
       
-      statusText?.text = "🚀 Serveur démarré automatiquement sur $localIP:$port"
-      statusText?.setTextColor(0xFF4CAF50.toInt()) // Vert pour succès
+      statusText?.text = getString(R.string.server_auto_started, localIP, port)
+      statusText?.setTextColor(0xFF4CAF50.toInt()) // Green for success
       
-      Log.i("FTP", "Serveur FTP démarré automatiquement avec succès sur $localIP:$port")
-      Toast.makeText(this, "Serveur FTP démarré automatiquement sur $localIP:$port", Toast.LENGTH_LONG).show()
+      Log.i("FTP", "FTP server auto-started successfully on $localIP:$port")
+      Toast.makeText(this, getString(R.string.server_auto_started, localIP, port), Toast.LENGTH_LONG).show()
       
     } catch (e: Exception) {
-      Log.e("FTP", "Erreur lors du démarrage automatique du serveur FTP", e)
-      statusText?.text = "❌ Erreur de démarrage: ${e.message}"
-      statusText?.setTextColor(0xFFF44336.toInt()) // Rouge pour erreur
-      Toast.makeText(this, "Erreur de démarrage automatique: ${e.message}", Toast.LENGTH_LONG).show()
+      Log.e("FTP", "Error during FTP server auto-start", e)
+      statusText?.text = getString(R.string.server_start_error, e.message ?: "Unknown")
+      statusText?.setTextColor(0xFFF44336.toInt()) // Red for error
+      Toast.makeText(this, getString(R.string.server_start_error, e.message ?: "Unknown"), Toast.LENGTH_LONG).show()
     }
   }
 
@@ -447,9 +447,9 @@ class PancakeActivity : Activity() {
         }
       }
     } catch (e: Exception) {
-      return "Inconnue"
+      return "Unknown"
     }
-    return "Inconnue"
+    return "Unknown"
   }
 
   private fun setupWakeLock() {
@@ -460,22 +460,22 @@ class PancakeActivity : Activity() {
         "MQFTPServer::FTPServerWakeLock"
       )
       wakeLock?.acquire(10*60*1000L /*10 minutes*/)
-      Log.i("FTP", "WakeLock acquis pour maintenir le serveur actif")
+      Log.i("FTP", "WakeLock acquired to keep server active")
     } catch (e: Exception) {
-      Log.e("FTP", "Erreur lors de l'acquisition du WakeLock", e)
+      Log.e("FTP", "Error acquiring WakeLock", e)
     }
   }
 
   override fun onPause() {
     super.onPause()
-    Log.i("FTP", "Activité en pause - serveur FTP reste actif")
+    Log.i("FTP", "Activity paused - FTP server remains active")
   }
 
   override fun onResume() {
     super.onResume()
-    Log.i("FTP", "Activité reprise")
+    Log.i("FTP", "Activity resumed")
     
-    // Réacquérir le WakeLock si nécessaire
+    // Re-acquire WakeLock if necessary
     if (wakeLock?.isHeld != true) {
       setupWakeLock()
     }
@@ -483,47 +483,47 @@ class PancakeActivity : Activity() {
 
   override fun onStop() {
     super.onStop()
-    Log.i("FTP", "Activité arrêtée - serveur FTP reste actif en arrière-plan")
+    Log.i("FTP", "Activity stopped - FTP server remains active in background")
   }
 
   override fun onRestart() {
     super.onRestart()
-    Log.i("FTP", "Activité redémarrée")
+    Log.i("FTP", "Activity restarted")
   }
 
   override fun onDestroy() {
     super.onDestroy()
     
-    // Arrêter le serveur FTP
+    // Stop FTP server
     ftpServer?.stop()
     
-    // Libérer le WakeLock
+    // Release WakeLock
     try {
       wakeLock?.release()
-      Log.i("FTP", "WakeLock libéré")
+      Log.i("FTP", "WakeLock released")
     } catch (e: Exception) {
-      Log.e("FTP", "Erreur lors de la libération du WakeLock", e)
+      Log.e("FTP", "Error releasing WakeLock", e)
     }
   }
 
   private fun createTestFiles(rootDir: File) {
     try {
-      // Créer un fichier de test
+      // Create a test file
       val testFile = File(rootDir, "readme.txt")
       if (!testFile.exists()) {
-        testFile.writeText("Bienvenue sur le serveur FTP!\nCe fichier a été créé automatiquement.")
+        testFile.writeText("Welcome to the FTP server!\nThis file was created automatically.")
       }
       
-      // Créer un dossier de test
+      // Create a test folder
       val testFolder = File(rootDir, "documents")
       if (!testFolder.exists()) {
         testFolder.mkdirs()
-        File(testFolder, "exemple.txt").writeText("Fichier d'exemple dans le dossier documents")
+        File(testFolder, "example.txt").writeText("Example file in the documents folder")
       }
       
-      Log.i("FTP", "Fichiers de test créés dans ${rootDir.absolutePath}")
+      Log.i("FTP", "Test files created in ${rootDir.absolutePath}")
     } catch (e: Exception) {
-      Log.e("FTP", "Erreur lors de la création des fichiers de test", e)
+      Log.e("FTP", "Error creating test files", e)
     }
   }
 }
