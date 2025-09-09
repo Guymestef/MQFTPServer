@@ -102,6 +102,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
+                android:baselineAligned="false"
                 android:layout_marginBottom="16dp">
 
                 <LinearLayout
@@ -125,6 +126,8 @@
                         android:layout_height="48dp"
                         android:hint="@string/username_hint"
                         android:text="@string/default_username"
+                        android:inputType="text"
+                        android:autofillHints="username"
                         android:minHeight="48dp"
                         android:gravity="center_vertical" />
                 </LinearLayout>
@@ -150,6 +153,7 @@
                         android:layout_height="48dp"
                         android:hint="@string/password_hint"
                         android:inputType="textPassword"
+                        android:autofillHints="password"
                         android:text="@string/default_password"
                         android:minHeight="48dp"
                         android:gravity="center_vertical" />
@@ -176,6 +180,7 @@
                         android:layout_height="48dp"
                         android:hint="@string/port_hint"
                         android:inputType="number"
+                        android:autofillHints="none"
                         android:text="@string/default_port"
                         android:minHeight="48dp"
                         android:gravity="center_vertical" />
@@ -200,6 +205,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
+                    android:baselineAligned="false"
                     android:layout_marginTop="4dp">
 
                     <EditText
@@ -210,6 +216,8 @@
                         android:layout_weight="1"
                         android:layout_marginEnd="8dp"
                         android:hint="@string/root_path_hint"
+                        android:inputType="textUri"
+                        android:autofillHints="none"
                         android:textSize="12sp"
                         android:minHeight="48dp"
                         android:gravity="center_vertical" />
@@ -225,7 +233,7 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- Séparateur -->
+            <!-- Separator -->
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
@@ -248,6 +256,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
+                android:baselineAligned="false"
                 android:layout_marginBottom="20dp">
 
                 <Button
