@@ -8,11 +8,22 @@ This directory contains scripts to build a release signed APK for the MQFTPServe
 A PowerShell script that provides secure password handling and automatic build configuration.
 
 **Features:**
+
 - Secure password input (passwords are not stored in plain text)
+- **Automatic version generation** based on current date and git commits
 - Automatic signing configuration injection
 - Build validation and error handling
-- Automatic APK copying to project root with timestamp
+- Automatic APK copying to project root with version info
 - Backup and restore of build configuration
+
+**Automatic Versioning System:**
+
+- **Major version**: Current year (e.g., 2025)
+- **Minor version**: Current month (e.g., 9 for September)  
+- **Patch version**: Current day (e.g., 10)
+- **Build number**: Git commit count
+- **Example**: Version 2025.9.10 with build 127
+- **APK filename**: `MQFTPServer-v2025.9.10-build127-20250910-1430.apk`
 
 **Usage:**
 
@@ -113,8 +124,11 @@ The scripts will:
 ## Output
 
 Successful builds will generate:
+
 - `app/build/outputs/apk/release/app-release.apk` - The main APK file
-- `MQFTPServer-release-YYYYMMDD-HHMM.apk` - A timestamped copy in the project root
+- `MQFTPServer-v{VERSION}-build{BUILD}-{TIMESTAMP}.apk` - A versioned copy in the project root
+
+Example output filename: `MQFTPServer-v2025.9.10-build127-20250910-1430.apk`
 
 ## Security Notes
 

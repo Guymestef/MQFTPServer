@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="512dp"
+    android:height="512dp"
+    android:viewportWidth="512"
+    android:viewportHeight="512">
+    
+    <!-- Background -->
+    <path 
+        android:fillColor="#16213E"
+        android:pathData="M0,0h512v512h-512z" />
+    
+    <!-- VR headset -->
+    <path
+        android:fillColor="#FF6B6B"
+        android:pathData="M128,150h256c21,0 42,21 42,42v85c0,21 -21,42 -42,42H128c-21,0 -42,-21 -42,-42v-85c0,-21 21,-42 42,-42z" />
+    
+    <!-- VR lenses -->
+    <path
+        android:fillColor="#0F3460"
+        android:pathData="M192,213m-32,0a32,32 0,1 1,64 0a32,32 0,1 1,-64 0" />
+    <path
+        android:fillColor="#0F3460"
+        android:pathData="M320,213m-32,0a32,32 0,1 1,64 0a32,32 0,1 1,-64 0" />
+    
+    <!-- Server tower -->
+    <path
+        android:fillColor="#4ECDC4"
+        android:pathData="M192,330h128v106H192z" />
+    
+    <!-- Server segments -->
+    <path
+        android:fillColor="#45B7AA"
+        android:pathData="M203,352h106v16H203z" />
+    <path
+        android:fillColor="#45B7AA"
+        android:pathData="M203,380h106v16H203z" />
+    <path
+        android:fillColor="#45B7AA"
+        android:pathData="M203,408h106v16H203z" />
+    
+    <!-- FTP arrows -->
+    <path
+        android:fillColor="#FFE66D"
+        android:pathData="M64,256L120,256L96,213L96,234L160,234L160,278L96,278L96,299z" />
+    <path
+        android:fillColor="#FFE66D"
+        android:pathData="M448,256L392,256L416,299L416,278L352,278L352,234L416,234L416,213z" />
+</vector>

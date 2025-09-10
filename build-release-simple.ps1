@@ -29,6 +29,11 @@ Options:
   -Clean                   Clean build (removes build cache)
   -Help                    Show this help message
 
+Automatic Versioning:
+  - Version Name: YYYY.MM.DD (e.g., 2025.9.10)
+  - Version Code: Git commit count
+  - APK filename includes version and build number
+
 Examples:
   .\build-release-simple.ps1                                           # Auto-detects release keystore
   .\build-release-simple.ps1 -KeystorePath "C:\keys\release.jks" -KeyAlias "mykey"
@@ -40,12 +45,71 @@ Note:
     * %USERPROFILE%\Documents\release.jks
     * .\keystore\release.jks
     * .\release.jks
+  - Automatic version generation based on date and git commits
   - Debug keystore is only offered as fallback with warnings
   - Passwords will be prompted securely during execution
   - You can also set them via environment variables:
     - MQFTP_KEYSTORE_PATH
     - MQFTP_KEY_ALIAS
 "@
+}
+
+function Get-VersionInfo {
+    Write-Host "Generating version information..." -ForegroundColor Yellow
+    
+    # Get current date
+    $currentDate = Get-Date
+    $major = $currentDate.Year
+    $minor = $currentDate.Month
+    $patch = $currentDate.Day
+    
+    # Get commit count for build number
+    try {
+        $commitCount = (git rev-list --count HEAD 2>$null) -replace '\s', ''
+        if (-not $commitCount -or $commitCount -eq "") {
+            Write-Warning "Could not get git commit count, using default build number 1"
+            $commitCount = "1"
+        }
+        $build = [int]$commitCount
+    }
+    catch {
+        Write-Warning "Git not available or not a git repository, using default build number 1"
+        $build = 1
+    }
+    
+    $versionName = "$major.$minor.$patch"
+    $versionCode = $build
+    
+    Write-Host "Version Name: $versionName" -ForegroundColor Green
+    Write-Host "Version Code: $versionCode" -ForegroundColor Green
+    Write-Host "Build Number: $build (from $commitCount commits)" -ForegroundColor Green
+    
+    return @{
+        Major = $major
+        Minor = $minor
+        Patch = $patch
+        Build = $build
+        VersionName = $versionName
+        VersionCode = $versionCode
+    }
+}
+
+function Update-AppVersion {
+    param([hashtable]$versionInfo)
+    
+    Write-Host "Updating app version in build.gradle.kts..." -ForegroundColor Yellow
+    
+    $buildGradlePath = "app\build.gradle.kts"
+    $content = Get-Content $buildGradlePath -Raw
+    
+    # Update versionCode
+    $content = $content -replace 'versionCode\s*=\s*\d+', "versionCode = $($versionInfo.VersionCode)"
+    
+    # Update versionName
+    $content = $content -replace 'versionName\s*=\s*"[^"]*"', "versionName = `"$($versionInfo.VersionName)`""
+    
+    Set-Content -Path $buildGradlePath -Value $content -NoNewline
+    Write-Host "App version updated to $($versionInfo.VersionName) (code: $($versionInfo.VersionCode))" -ForegroundColor Green
 }
 
 function Test-Prerequisites {
@@ -175,6 +239,7 @@ function Get-SigningInfo {
 function Build-SignedAPK {
     param(
         [hashtable]$signingInfo,
+        [hashtable]$versionInfo,
         [bool]$cleanBuild
     )
     
@@ -226,8 +291,9 @@ Size: $size MB
 You can install this APK on your device or upload it to app stores.
 "@ -ForegroundColor Green
                 
-                # Copy to project root for convenience
-                $projectApkName = "MQFTPServer-release-$(Get-Date -Format 'yyyyMMdd-HHmm').apk"
+                # Copy to project root for convenience with version info
+                $timestamp = Get-Date -Format 'yyyyMMdd-HHmm'
+                $projectApkName = "MQFTPServer-v$($versionInfo.VersionName)-build$($versionInfo.Build)-$timestamp.apk"
                 Copy-Item $fullPath $projectApkName
                 Write-Host "APK also copied to: $PWD\$projectApkName" -ForegroundColor Green
             }
@@ -259,17 +325,26 @@ try {
     
     Test-Prerequisites
     
+    # Generate version information based on current date and git commits
+    $versionInfo = Get-VersionInfo
+    
     $signingInfo = Get-SigningInfo
     
     # Check if we need to update build.gradle.kts for signing
     $buildGradlePath = "app\build.gradle.kts"
     $buildContent = Get-Content $buildGradlePath -Raw
     
+    # Backup original file
+    Copy-Item $buildGradlePath "$buildGradlePath.backup"
+    
+    # Update version information first
+    Update-AppVersion $versionInfo
+    
+    # Re-read content after version update
+    $buildContent = Get-Content $buildGradlePath -Raw
+    
     if (-not ($buildContent -match "signingConfigs")) {
         Write-Host "Adding signing configuration to build.gradle.kts..." -ForegroundColor Yellow
-        
-        # Backup original file
-        Copy-Item $buildGradlePath "$buildGradlePath.backup"
         
         # Add signing configuration
         $signingConfig = @'
@@ -298,7 +373,7 @@ try {
         Write-Host "Signing configuration added to build.gradle.kts" -ForegroundColor Green
     }
     
-    Build-SignedAPK $signingInfo $Clean
+    Build-SignedAPK $signingInfo $versionInfo $Clean
     
     Write-Host "`nBuild process completed successfully!" -ForegroundColor Green
     Write-Host "You can now install the APK on your device or publish it to app stores." -ForegroundColor Green
